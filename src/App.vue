@@ -2,10 +2,10 @@
   <div class="box">
     <div class="diamond"><span class="diamond-text">成步堂</span> </div>
     <div class="subtitle-box">
-      <div v-if="currentIndex < subtitles.length" :key="currentIndex" class="subtitle">
-        {{ currentSubtitle }}
+      <div v-if="currentIndex < subtitles.length" :key="currentIndex" class="subtitle"
+        :style="{ color: subtitles[currentIndex].color }" v-html="currentSubtitle">
       </div>
-      <div @click="nextSubtitle" v-if="showButton" class="subtitle-next"></div>
+      <div @click="nextSubtitle(false)" v-if="showButton" class="subtitle-next"></div>
     </div>
 
   </div>
@@ -13,11 +13,11 @@
 
 <script setup>
 import { ref, watch, onMounted } from 'vue';
-
-import { subtitles } from "./assets/text/index"
+// 文本
+import { subtitles, punctuationRegex } from "./assets/text/index"
 // 索引值
 const currentIndex = ref(0);
-// 文本
+
 
 // 活跃的要显示的文本
 const currentSubtitle = ref(subtitles[currentIndex.value].value);
@@ -25,23 +25,132 @@ const currentSubtitle = ref(subtitles[currentIndex.value].value);
 const showButton = ref(true);
 
 // 下一个活跃文本
-const nextSubtitle = () => {
+const nextSubtitle = (flag = false) => {
   // 超过文本最大值，索引不再增加
   if (currentIndex.value < subtitles.length - 1) {
     currentIndex.value++;
     // 触发点击音效
-    playSound("http://localhost:8080/点击查看.mp3")
+    // 触发有人不想要音效
+    playSound("http://localhost:8080/点击查看.mp3", flag)
     showButton.value = false; // 隐藏按钮
   }
 };
 
 // 开启并使用音频
-function playSound(src) {
-  const audio = new Audio(src); // 替换成你的音效文件路径
-  audio.play();
+function playSound(src, close = false) {
+  // 如果在某种情况下不要音效，请传入close = true
+  if (!close) {
+    const audio = new Audio(src); // 替换成你的音效文件路径
+    audio.play();
+  }
+
 }
 
 
+
+// 观察索引值的变化，使其切换活跃显示文本
+watch(currentIndex, () => {
+  // 切换下一个字幕
+  currentSubtitle.value = subtitles[currentIndex.value].value;
+  // 一字一字显示
+  renderSubtitle()
+
+
+});
+
+
+// 更新定时器的时间延迟
+function updateIntervalDelay(test) {
+  return punctuationRegex.test(test) ? 200 : 60;
+}
+
+// 一字一字显示,且遇到punctuationRegex匹配的情况时变化
+function renderSubtitle() {
+  // 判断长度是否到头了
+  if (currentIndex.value < subtitles.length) {
+    // 清空当前字幕内容,防止显示所有字体
+    currentSubtitle.value = '';
+    // 当前要修改的字幕
+    let subtitle = subtitles[currentIndex.value].value;
+    // 当前的字幕对象
+    let subtitleItem = subtitles[currentIndex.value];
+    // 新的索引值
+    let index = 0;
+    // 一个定时器
+    let interval;
+    // 控制音乐播放
+    let closeMusic;
+
+    // 更新定时器的时间延迟
+    updateIntervalDelay(subtitle.charAt(index - 1))
+    // 让currentSubtitle活跃显示字幕的被subtitle赋值,从而当subtitle截取一个个字时动态显示
+    function displayNextCharacter() {
+
+      // 尝试正则
+      const lessThanRegex = /</g;
+      // 判断成功即是匹配到了< 也就是标签的开头，之后，文本会经历停滞
+      if (lessThanRegex.test(subtitle.substring(0, index))) {
+        // 不将这个字渲染上去,同时 匹配可能会出现的标签
+        // 同时关闭音乐
+        closeMusic = true
+        const brTagRegex = /<br>|<span.*?<\/span>/g;
+        // 当出现匹配成功的标签时，结束停滞并且渲染
+        if (brTagRegex.test(subtitle.substring(0, index))) {
+          // 将文本渲染上去
+          currentSubtitle.value = subtitle.substring(0, index);
+          // 同时关闭音乐
+          closeMusic = false
+        }
+
+      }
+      // 这里是没有<匹配成功的时候
+      else {
+        currentSubtitle.value = subtitle.substring(0, index);
+      }
+      // 每次字数加1
+      index++;
+
+      // 当索引值比字幕长度还短时,继续执行方法,否则停止定时器并显示按钮
+      if (index <= subtitle.length) {
+
+        // 更新定时器的时间延迟,currentIntervalDelay是返回值
+        let currentIntervalDelay;
+        // 如果没有音乐则不需要执行,没有音乐就证明此打字不计入打字延迟效果
+        if (closeMusic) {
+          currentIntervalDelay = 0
+        } else {
+          currentIntervalDelay = updateIntervalDelay(subtitle.charAt(index - 1));
+        }
+        // 清除当前定时器，为了重新提供新的定时器的值
+        clearInterval(interval);
+
+        // 重新创建一个定时器，这里其实算递归，没有 index <= subtitle.length 的话会一直执行 
+        interval = setTimeout(displayNextCharacter, currentIntervalDelay); // 根据新的时间间隔创建新的定时器
+
+        // 同时根据布尔值决定播放音频
+        playSound("http://localhost:8080/1_字幕弹出音.mp3", closeMusic)
+
+      } else {
+        // 显示按钮
+        showButton.value = true;
+        // 如果需要直接下一步，不再需要点击
+        needNextSubtitle(subtitleItem.skip)
+
+      }
+    }
+
+    // 别忘了这里的函数不是displayNextCharacter而是renderSubtitle，要使用还要调用它
+    displayNextCharacter();
+  }
+}
+
+// 假设当前有段文本需要自己跳转时
+const needNextSubtitle = (flag) => {
+  // 直接触发跳转
+  if (flag) {
+    nextSubtitle(flag)
+  }
+}
 // 节流阀
 function throttle(func, delay) {
   let timer = null;
@@ -53,61 +162,6 @@ function throttle(func, delay) {
       }, delay);
     }
   };
-}
-// 观察索引值的变化，使其切换活跃显示文本
-watch(currentIndex, (index) => {
-  // 切换下一个字幕
-  currentSubtitle.value = subtitles[currentIndex.value].value;
-  // 一字一字显示
-  renderSubtitle()
-
-
-});
-// 创建标点符号的正则表达式
-const punctuationRegex = /[。,，\s\r]/;
-
-// 更新定时器的时间延迟
-function updateIntervalDelay(test) {
-  return punctuationRegex.test(test) ? 200 : 60;
-}
-// 一字一字显示,且遇到punctuationRegex匹配的情况时变化
-function renderSubtitle() {
-  // 判断长度是否到头了
-  if (currentIndex.value < subtitles.length) {
-    // 清空当前字幕内容,防止显示所有字体
-    currentSubtitle.value = '';
-    // 当前要修改的字幕
-    let subtitle = subtitles[currentIndex.value].value;
-    // 新的索引值
-    let index = 0;
-    // 一个定时器
-    let interval;
-    // 更新定时器的时间延迟
-    updateIntervalDelay(subtitle.charAt(index - 1))
-    // 让currentSubtitle活跃显示字幕的被subtitle赋值,从而当subtitle截取一个个字时动态显示
-    function displayNextCharacter() {
-      currentSubtitle.value = subtitle.substring(0, index);
-      index++;
-      // 当索引值比字幕长度还小时,继续执行方法,否则停止定时器并显示按钮
-      if (index <= subtitle.length) {
-        // 更新定时器的时间延迟,currentIntervalDelay是返回值
-        let currentIntervalDelay = updateIntervalDelay(subtitle.charAt(index - 1));
-        // 清除当前定时器，为了重新提供新的定时器的值
-        clearInterval(interval);
-        // 重新创建一个定时器，这里其实算递归，没有 index <= subtitle.length 的话会一直执行 
-        interval = setTimeout(displayNextCharacter, currentIntervalDelay); // 根据新的时间间隔创建新的定时器
-        // 同时播放音频
-        playSound("http://localhost:8080/1_字幕弹出音.mp3")
-
-      } else {
-        // 显示按钮
-        showButton.value = true;
-      }
-    }
-
-    // 别忘了这里的函数不是displayNextCharacter而是renderSubtitle，要使用还要调用它
-    displayNextCharacter();
-  }
 }
 </script>
 
@@ -155,21 +209,23 @@ body {
   height: 30vh;
   border-bottom: 4px solid #ffffff;
   border-top: 2px solid #ffffff;
-  background-color: #0a1426;
+  background-color: #14274c;
 }
 
 .subtitle-box {
   display: flex;
   align-items: center;
   padding: 4vh 0;
-
+  height: 100%;
   color: #fff;
 
 }
 
 .subtitle {
-  margin-left: 18vw;
+  margin-left: 16vw;
   width: 65vw;
+  height: 100%;
+
   font-size: 3rem;
 
 }
