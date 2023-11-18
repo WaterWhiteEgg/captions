@@ -1,9 +1,13 @@
 <template>
   <div class="box">
-    <div v-if="currentIndex < subtitles.length" :key="currentIndex">
-      {{ currentSubtitle }}
+    <div class="diamond"><span class="diamond-text">成步堂</span> </div>
+    <div class="subtitle-box">
+      <div v-if="currentIndex < subtitles.length" :key="currentIndex" class="subtitle">
+        {{ currentSubtitle }}
+      </div>
+      <div @click="nextSubtitle" v-if="showButton" class="subtitle-next"></div>
     </div>
-    <button @click="nextSubtitle" v-if="showButton">下一个</button>
+
   </div>
 </template>
 
@@ -107,22 +111,99 @@ function renderSubtitle() {
 
 
 <style>
-/* 样式部分保持不变 */
-.subtitle {
-  height: 20px;
-  overflow: hidden;
-  animation: showSubtitle 6.3s steps(30, end) forwards;
-  /* 3秒显示完整句子 */
+/* 定义字体 */
+@font-face {
+  font-family: 'MyCustomFont';
+  src: url('./assets/text/SourceHanSerifCN-Regular-1.otf') format('woff2'),
+    /* 现代浏览器支持的格式 */
 }
 
-@keyframes showSubtitle {
-  from {
-    width: 0;
+/* 定义动画*/
+@keyframes swing {
+  0% {
+    transform: translateX(0);
   }
 
-  to {
-    width: 100%;
+  25% {
+    transform: translateX(-3px)
   }
+
+  75% {
+    transform: translateX(3px)
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
+
+html,
+body {
+  font-family: 'MyCustomFont', sans-serif;
+  /* 使用自定义字体 */
+  margin: 0;
+  padding: 0;
+  background-color: red;
+}
+
+.box {
+  position: absolute;
+  bottom: 40%;
+  width: 100vw;
+  height: 30vh;
+  border-bottom: 4px solid #ffffff;
+  border-top: 2px solid #ffffff;
+  background-color: #0a1426;
+}
+
+.subtitle-box {
+  display: flex;
+  align-items: center;
+  padding: 4vh 0;
+
+  color: #fff;
+
+}
+
+.subtitle {
+  margin-left: 18vw;
+  width: 65vw;
+  font-size: 3rem;
+
+}
+
+.diamond {
+  position: absolute;
+  top: -7.8%;
+  left: 7.8%;
+  height: 10vh;
+  width: 12.0vw;
+  display: flex;
+  justify-content: center;
+  background-image: url("./assets/png/titleBox.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+
+}
+
+.subtitle-next {
+  position: absolute;
+  right: 4%;
+  top: 35%;
+  width: 5vw;
+  height: 8vh;
+  animation: swing 1.5s ease-in-out infinite;
+  /* 应用动画效果 */
+
+  background-image: url("./assets/png/arrow.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.diamond-text {
+  font-size: 1.4rem;
+  color: #fff;
+
 }
 </style>
 
