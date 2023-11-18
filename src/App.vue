@@ -13,12 +13,14 @@
 
 <script setup>
 import { ref, watch, onMounted } from 'vue';
+
+import { subtitles } from "./assets/text/index"
 // 索引值
 const currentIndex = ref(0);
 // 文本
-const subtitles = ["", "第一句字幕第一句字 幕第 一句'fff'句 字幕第一句字幕第一句字幕第一句字幕，第一句字幕", "第二句字幕", "第三句字幕"]; // 字幕数组
+
 // 活跃的要显示的文本
-const currentSubtitle = ref(subtitles[currentIndex.value]);
+const currentSubtitle = ref(subtitles[currentIndex.value].value);
 // 控制点击按钮显示
 const showButton = ref(true);
 
@@ -55,14 +57,14 @@ function throttle(func, delay) {
 // 观察索引值的变化，使其切换活跃显示文本
 watch(currentIndex, (index) => {
   // 切换下一个字幕
-  currentSubtitle.value = subtitles[currentIndex.value];
+  currentSubtitle.value = subtitles[currentIndex.value].value;
   // 一字一字显示
   renderSubtitle()
 
 
 });
 // 创建标点符号的正则表达式
-const punctuationRegex = /[。,，\s]/;
+const punctuationRegex = /[。,，\s\r]/;
 
 // 更新定时器的时间延迟
 function updateIntervalDelay(test) {
@@ -75,7 +77,7 @@ function renderSubtitle() {
     // 清空当前字幕内容,防止显示所有字体
     currentSubtitle.value = '';
     // 当前要修改的字幕
-    let subtitle = subtitles[currentIndex.value];
+    let subtitle = subtitles[currentIndex.value].value;
     // 新的索引值
     let index = 0;
     // 一个定时器
@@ -114,7 +116,7 @@ function renderSubtitle() {
 /* 定义字体 */
 @font-face {
   font-family: 'MyCustomFont';
-  src: url('./assets/text/SourceHanSerifCN-Regular-1.otf') format('woff2'),
+  src: url('./assets/font/SourceHanSerifCN-Regular-1.otf') format('woff2'),
     /* 现代浏览器支持的格式 */
 }
 
