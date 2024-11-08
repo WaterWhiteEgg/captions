@@ -22,7 +22,7 @@
 import { ref, watch, onMounted } from "vue";
 // 文本
 import { subtitles, updateIntervalDelay } from "@/assets/text/index";
-// 索引值
+// 字幕索引值
 const currentIndex = ref(0);
 
 // 活跃的要显示的文本
@@ -63,25 +63,37 @@ watch(currentIndex, () => {
 let interval;
 // 控制音乐播放
 let closeMusic;
-// 索引值
+// 文本索引值
 let index;
 // 当前要修改的字幕
 let subtitle = subtitles[currentIndex.value].value;
 // 当前的字幕对象
 let subtitleItem = subtitles[currentIndex.value];
+// 标签后截取的文本
+let newSubtitle = "";
 
 // 检测html标签，延迟他让其渲染完成再继续打字机效果（目前只能一次）
 function displayNextCharacter() {
   // 尝试正则
   const lessThanRegex = /</g;
-  // 判断成功即是匹配到了< 也就是标签的开头，之后，文本会经历停滞
-  if (lessThanRegex.test(subtitle.substring(0, index))) {
+  //   console.log( subtitle.substring(0, index).replace(newSubtitle, ""));
+
+  // 判断成功即是匹配到了< 也就是标签的开头，之后，文本会经历停滞,通过.replace(newSubtitle,"")截取已经渲染的标签来复用效果
+  if (
+    lessThanRegex.test(subtitle.substring(0, index).replace(newSubtitle, ""))
+  ) {
     // 不将这个字渲染上去,同时 匹配可能会出现的标签
     // 同时关闭音乐
     closeMusic = true;
     const brTagRegex = /<br>|<span.*?<\/span>/g;
-    // 当出现匹配成功的标签时，结束停滞并且渲染
-    if (brTagRegex.test(subtitle.substring(0, index))) {
+
+    // 当出现匹配成功的标签时，结束停滞并且渲染,通过.replace(newSubtitle,"")截取已经渲染的标签防止重复调用渲染
+    if (
+      brTagRegex.test(subtitle.substring(0, index).replace(newSubtitle, ""))
+    ) {
+      // 记录之前的文本，不再检测
+      newSubtitle = subtitle.substring(0, index);
+
       // 将文本渲染上去
       currentSubtitle.value = subtitle.substring(0, index);
       // 同时关闭音乐
@@ -94,12 +106,11 @@ function displayNextCharacter() {
   }
   // 每次字数加1
   index++;
-//   继续寻找下一个字
-  doNextCharacter()
-
+  //   继续寻找下一个字
+  doNextCharacter();
 }
 // 下一个字的显示与声音
-function doNextCharacter (){
+function doNextCharacter() {
   // 当索引值比字幕长度还短时,继续执行方法,否则停止定时器并显示按钮
   if (index <= subtitle.length) {
     // 更新定时器的时间延迟,currentIntervalDelay是返回值
@@ -139,6 +150,8 @@ function renderSubtitle() {
     currentSubtitle.value = "";
     // 新的索引值
     index = 0;
+    // 新的截取字幕
+    newSubtitle = "";
 
     // 更新定时器的时间延迟
     updateIntervalDelay(subtitle.charAt(index - 1));
@@ -241,7 +254,7 @@ body {
   height: 8vh;
   animation: swing 1.5s ease-in-out infinite;
   /* 应用动画效果 */
-cursor: pointer;
+  cursor: pointer;
   background-image: url("@/assets/png/arrow.png");
   background-size: contain;
   background-repeat: no-repeat;
