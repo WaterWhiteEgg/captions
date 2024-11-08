@@ -21,5 +21,8 @@ _为什么要8080呢，因为我就写了8080，如果你优先 npm run serve �
 
  `http-server`
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### 使用
+<span>标签在里面可以写样式（字幕是html渲染的）也支持<br>换行，注意要是使用其他标签,我可没有做他们的后续渲染（其实换个正则也能做只是真没必要），如果用其他标签会导致字幕渲染出现漏字问题（字幕是一个个显示出来的，当遇到< 时他会当字符串知道整个标签显示）
+- 对象里面的skip=true时，直接下一步（用于做大妈哪种超级嘴炮效果）
+
+
