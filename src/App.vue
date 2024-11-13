@@ -1,12 +1,18 @@
 <template>
-  1
- <subtitles></subtitles>
+  <subtitles></subtitles>
 </template>
 
 <script setup>
-import subtitles from '@/view/subtitles/subtitles.vue';
-
+import subtitles from "@/view/subtitles/subtitles.vue";
 </script>
 
-<style scoped></style>
-
+<style>
+html,
+body {
+  font-family: "MyCustomFont", sans-serif;
+  /* 使用自定义字体 */
+  margin: 0;
+  padding: 0;
+  background-color: red;
+}
+</style>

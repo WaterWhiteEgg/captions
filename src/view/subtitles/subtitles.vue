@@ -1,6 +1,6 @@
 <template>
   <div class="box">
-    <div class="diamond"><span class="diamond-text">成步堂</span></div>
+    <div class="diamond"><span class="diamond-text">成步3332堂</span></div>
     <div class="subtitle-box">
       <div
         v-if="currentIndex < subtitles.length"
@@ -19,9 +19,27 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from "vue";
+import { ref, watch, onMounted, onUnmounted } from "vue";
 // 文本
 import { subtitles, updateIntervalDelay } from "@/assets/text/index";
+
+onMounted(() => {
+  // 全局监听键盘事件
+  window.addEventListener("keydown", handleKeyDown);
+});
+
+onUnmounted(() => {
+  // 组件销毁时移除事件监听
+  window.removeEventListener("keydown", handleKeyDown);
+});
+
+// 回车键触发的函数
+const handleKeyDown = (event) => {
+  // 保证在下一步后可以使用回车下一步
+  if (event.key === "Enter" && showButton.value) {
+    nextSubtitle(false); // 触发nextSubtitle函数
+  }
+};
 // 字幕索引值
 const currentIndex = ref(0);
 
@@ -198,18 +216,9 @@ const needNextSubtitle = (flag) => {
   }
 }
 
-html,
-body {
-  font-family: "MyCustomFont", sans-serif;
-  /* 使用自定义字体 */
-  margin: 0;
-  padding: 0;
-  background-color: red;
-}
-
 .box {
   position: absolute;
-  bottom: 40%;
+  bottom: 0;
   width: 100vw;
   height: 30vh;
   border-bottom: 4px solid #ffffff;
@@ -220,37 +229,21 @@ body {
 .subtitle-box {
   display: flex;
   align-items: center;
-  padding: 4vh 0;
   height: 100%;
   color: #fff;
 }
 
 .subtitle {
-  margin-left: 16vw;
-  width: 65vw;
+  box-sizing: border-box;
+  padding-left: 15vw;
+  padding-top: 2vh;
+  width: 85vw;
   height: 100%;
 
   font-size: 3rem;
 }
-
-.diamond {
-  position: absolute;
-  top: -7.8%;
-  left: 7.8%;
-  height: 10vh;
-  width: 12vw;
-  display: flex;
-  justify-content: center;
-  background-image: url("@/assets/png/titleBox.png");
-  background-size: contain;
-  background-repeat: no-repeat;
-}
-
 .subtitle-next {
-  position: absolute;
-  right: 4%;
-  top: 35%;
-  width: 5vw;
+  width: 8vw;
   height: 8vh;
   animation: swing 1.5s ease-in-out infinite;
   /* 应用动画效果 */
@@ -259,9 +252,24 @@ body {
   background-size: contain;
   background-repeat: no-repeat;
 }
-
+.diamond {
+  position: absolute;
+  top: -16.5px;
+  left: 7%;
+  width: 15vw;
+  min-width: 148px;
+  height: 5vh;
+  min-height: 10px;
+  max-height: 33px;
+  max-width: 174px;
+  display: flex;
+  justify-content: center;
+  background-image: url("@/assets/png/titleBox.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+}
 .diamond-text {
-  font-size: 1.4rem;
+  font-size: clamp(1rem, 2vw, 1.3rem);
   color: #fff;
 }
 </style>

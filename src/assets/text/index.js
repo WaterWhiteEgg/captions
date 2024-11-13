@@ -5,7 +5,7 @@
 export const subtitles = [
     { value: "" },
     { value: `一句字幕<br>第一wwwwwwww<br>wwwwwww2222222<br>2222222<br>22222222eee`, color: "#5fa7d9"},
-    { value: `一  句  字  幕 <br>2<span style='color: red;'>幕第一</span>`, color: "#5fa7d9"},
+    { value: `一 句 字 幕 <br>2<span style='color: red;'>幕第一</span>`, color: "#5fa7d9"},
     { value: "第一句<br>字幕第一句字 幕第 一句'fff'句 字幕第一句字幕第一句字幕第一句字幕，第一句字幕", color: "#0fb01d" },
     { value: "第一句字幕第一句字 幕第 一句'fff'", color: "#0fb01d" },
     { value: "第一句'fff'句<br>字幕第一句字<span style='color: red;'>幕第一</span>句字幕第一句字幕，第一句字幕", color: "#0fb01d" },
