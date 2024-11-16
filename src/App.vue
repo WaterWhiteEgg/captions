@@ -1,9 +1,9 @@
 <template>
-  <subtitles></subtitles>
+  <background></background>
 </template>
 
 <script setup>
-import subtitles from "@/view/subtitles/subtitles.vue";
+import background from "@/view/background/background.vue";
 </script>
 
 <style>
@@ -13,6 +13,5 @@ body {
   /* 使用自定义字体 */
   margin: 0;
   padding: 0;
-  background-color: red;
 }
 </style>

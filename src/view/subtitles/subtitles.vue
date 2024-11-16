@@ -55,7 +55,7 @@ const nextSubtitle = (flag = false) => {
     currentIndex.value++;
     // 触发点击音效
     // 触发有人不想要音效
-    playSound("http://localhost:8080/点击查看.mp3", flag);
+    playSound("http://localhost:8080/mp3/点击查看.mp3", flag);
     showButton.value = false; // 隐藏按钮
   }
 };
@@ -147,7 +147,7 @@ function doNextCharacter() {
     interval = setTimeout(displayNextCharacter, currentIntervalDelay); // 根据新的时间间隔创建新的定时器
 
     // 同时根据布尔值决定播放音频
-    playSound("http://localhost:8080/1_字幕弹出音.mp3", closeMusic);
+    playSound("http://localhost:8080/mp3/1_字幕弹出音.mp3", closeMusic);
   } else {
     // 显示按钮
     showButton.value = true;
@@ -248,7 +248,7 @@ const needNextSubtitle = (flag) => {
   animation: swing 1.5s ease-in-out infinite;
   /* 应用动画效果 */
   cursor: pointer;
-  background-image: url("@/assets/png/arrow.png");
+  background-image: url("@/assets/png/ui/arrow.png");
   background-size: contain;
   background-repeat: no-repeat;
 }
@@ -264,7 +264,7 @@ const needNextSubtitle = (flag) => {
   max-width: 174px;
   display: flex;
   justify-content: center;
-  background-image: url("@/assets/png/titleBox.png");
+  background-image: url("@/assets/png/ui/titleBox.png");
   background-size: contain;
   background-repeat: no-repeat;
 }
