@@ -2,7 +2,7 @@
 // color设置背景色 #5fa7d9蓝色 #0fb01d绿色
 // 换行符 <br>
 // 设置文字样式 <span style='color: red;'></span> 
-export const subtitles = [
+export const subtitlesText = [
     { value: "" },
     { value: `一句字幕<br>第一wwwwwwww<br>wwwwwww2222222<br>2222222<br>22222222eee`, color: "#5fa7d9"},
     { value: `一 句 字 幕 <br>2<span style='color: red;'>幕第一</span>`, color: "#5fa7d9"},

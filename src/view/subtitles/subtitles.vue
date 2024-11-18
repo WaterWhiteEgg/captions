@@ -3,10 +3,10 @@
     <div class="diamond"><span class="diamond-text">成步3332堂</span></div>
     <div class="subtitle-box">
       <div
-        v-if="currentIndex < subtitles.length"
+        v-if="currentIndex < subtitlesText.length"
         :key="currentIndex"
         class="subtitle"
-        :style="{ color: subtitles[currentIndex].color }"
+        :style="{ color: subtitlesText[currentIndex].color }"
         v-html="currentSubtitle"
       ></div>
       <div
@@ -21,7 +21,7 @@
 <script setup>
 import { ref, watch, onMounted, onUnmounted } from "vue";
 // 文本
-import { subtitles, updateIntervalDelay } from "@/assets/text/index";
+import { subtitlesText, updateIntervalDelay } from "@/assets/text/index";
 
 onMounted(() => {
   // 全局监听键盘事件
@@ -44,14 +44,14 @@ const handleKeyDown = (event) => {
 const currentIndex = ref(0);
 
 // 活跃的要显示的文本
-const currentSubtitle = ref(subtitles[currentIndex.value].value);
+const currentSubtitle = ref(subtitlesText[currentIndex.value].value);
 // 控制点击按钮显示
 const showButton = ref(true);
 
 // 下一个活跃文本
 const nextSubtitle = (flag = false) => {
   // 超过文本最大值，索引不再增加
-  if (currentIndex.value < subtitles.length - 1) {
+  if (currentIndex.value < subtitlesText.length - 1) {
     currentIndex.value++;
     // 触发点击音效
     // 触发有人不想要音效
@@ -72,7 +72,7 @@ function playSound(src, close = false) {
 // 观察索引值的变化，使其切换活跃显示文本
 watch(currentIndex, () => {
   // 切换下一个字幕
-  currentSubtitle.value = subtitles[currentIndex.value].value;
+  currentSubtitle.value = subtitlesText[currentIndex.value].value;
   // 一字一字显示
   renderSubtitle();
 });
@@ -84,9 +84,9 @@ let closeMusic;
 // 文本索引值
 let index;
 // 当前要修改的字幕
-let subtitle = subtitles[currentIndex.value].value;
+let subtitle = subtitlesText[currentIndex.value].value;
 // 当前的字幕对象
-let subtitleItem = subtitles[currentIndex.value];
+let subtitleItem = subtitlesText[currentIndex.value];
 // 标签后截取的文本
 let newSubtitle = "";
 
@@ -159,11 +159,11 @@ function doNextCharacter() {
 function renderSubtitle() {
   // 更新数据
   // 当前要修改的字幕
-  subtitle = subtitles[currentIndex.value].value;
+  subtitle = subtitlesText[currentIndex.value].value;
   // 当前的字幕对象
-  subtitleItem = subtitles[currentIndex.value];
+  subtitleItem = subtitlesText[currentIndex.value];
   // 判断长度是否到头了
-  if (currentIndex.value < subtitles.length) {
+  if (currentIndex.value < subtitlesText.length) {
     // 清空当前字幕内容,防止显示之前的所有字体
     currentSubtitle.value = "";
     // 新的索引值
@@ -187,6 +187,15 @@ const needNextSubtitle = (flag) => {
     nextSubtitle(flag);
   }
 };
+// 将一些数据暴露
+defineExpose({
+  // 字幕索引值
+  currentIndex,
+  // 活跃的要显示的文本
+  currentSubtitle,
+  // 控制点击按钮显示
+  showButton,
+});
 </script>
 
 <style>
